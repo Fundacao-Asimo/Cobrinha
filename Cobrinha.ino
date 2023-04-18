@@ -29,7 +29,7 @@ byte board[16][2][8] = {0};
 
 void push(unsigned char x, unsigned char y)
 {
-  coordNode *aux = malloc(sizeof(coordNode));
+  coordNode *aux = (*coordNode) malloc(sizeof(coordNode));
   aux->x = x;
   aux->y = y;
   aux->next = NULL;
