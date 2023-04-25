@@ -3,11 +3,6 @@
 #define BitSet(arg,bit) ((arg) |= ((B10000)>>bit))
 #define BitClr(arg,bit) ((arg) &= ~((B10000)>>bit)) 
 
-struct button{
-  unsigned char value;
-  const unsigned char pin;
-};
-
 struct coord{
   char x, y;
 };
@@ -18,7 +13,7 @@ struct coordNode{
 };
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-button right = {0, 2}, down = {0, 3}, left = {0, 4}, up = {0, 5};
+unsigned char right = 2, down = 3, left = 4, up = 5;
 coordNode* snakeHead = NULL;
 coordNode* snakeTail = NULL;
 char snakeDir;
@@ -29,7 +24,7 @@ byte board[16][2][8] = {0};
 
 void push(unsigned char x, unsigned char y)
 {
-  coordNode *aux = (*coordNode) malloc(sizeof(coordNode));
+  coordNode *aux = (coordNode*) malloc(sizeof(coordNode));
   aux->x = x;
   aux->y = y;
   aux->next = NULL;
@@ -47,7 +42,7 @@ void pop()
   free(aux);
 }
 
-bool emptyChar(byte c[8])
+bool isEmptyChar(byte c[8])
 {
   for (unsigned char i = 0; i < 8; i++)
     if (c[i])
@@ -81,7 +76,7 @@ void pixelOFF(unsigned char x, unsigned char y)
 {
   unsigned char i;
   BitClr(board[x/5][y/8][y%8], x%5);
-  if (emptyChar(board[x/5][y/8]))
+  if (isEmptyChar(board[x/5][y/8]))
   {
     lcd.setCursor(x/5, y/8);
     lcd.print(' ');
@@ -120,11 +115,26 @@ void initSnake()
   pixelON(41, 8);
 }
 
+bool isSnake(unsigned char x, unsigned char y)
+{
+  coordNode *aux;
+  aux = snakeTail;
+  while (aux != NULL)
+  {
+    if (aux->x == x && aux->y == y)
+      return true;
+  }
+  return false;
+}
+
 void newFood()
 {
   food.x = random(80);
   food.y = random(16);
-  pixelON(food.x, food.y);
+  if (isSnake(food.x, food.y))
+    newFood();
+  else
+    pixelON(food.x, food.y);
 }
 
 void hello()
@@ -134,9 +144,9 @@ void hello()
   delay(1000);
 }
 
-bool isButton(button& b)
+bool isButton(unsigned char b)
 {
-  return !digitalRead(b.pin);
+  return !digitalRead(b);
 }
 
 void keyboardRead()
