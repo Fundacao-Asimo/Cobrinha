@@ -1,4 +1,4 @@
-# Jogo da Cobrina em Arduino
+# Jogo da Cobrinha em Arduino
 
 ## Componentes utilizados:
 
